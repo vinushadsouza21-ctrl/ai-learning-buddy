@@ -80,7 +80,7 @@ learner_answer = ""
 if activity == "Evaluate my answer":
     learner_answer = st.text_area("Type your quiz answer here")
 
-if st.button("Ask Professor Leaf"):
+if st.button("Ask Professor Byte"):
     if not topic.strip():
         st.warning("Please enter a topic first.")
     else:
