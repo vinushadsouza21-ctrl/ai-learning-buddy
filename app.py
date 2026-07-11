@@ -10,7 +10,7 @@ SETUP:
 """
 
 import streamlit as st
-from openai import OpenAI
+import google.generativeai as genai
 
 # ---------- CONFIG ----------
 st.set_page_config(page_title="AI Learning Buddy", page_icon="🌱")
@@ -59,18 +59,15 @@ TEMPLATES = {
 }
 
 # ---------- CLIENT ----------
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+model = genai.GenerativeModel(
+    model_name="gemini-1.5-flash",
+    system_instruction=PERSONA_PROMPT,
+)
 
 def ask_buddy(user_prompt: str) -> str:
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": PERSONA_PROMPT},
-            {"role": "user", "content": user_prompt},
-        ],
-        temperature=0.7,
-    )
-    return response.choices[0].message.content
+    response = model.generate_content(user_prompt)
+    return response.text
 
 # ---------- UI ----------
 st.title("🧮 AI Learning Buddy")
@@ -94,18 +91,17 @@ if st.button("Ask Professor Leaf"):
         st.write(reply)
 
 # ---------------------------------------------------------------------------
-# DEPLOYMENT STEPS (Streamlit Community Cloud — free, ~5 minutes)
+# DEPLOYMENT STEPS (100% free — no billing/credit card needed anywhere)
 # ---------------------------------------------------------------------------
-# 1. Create a free GitHub account (if you don't have one) and a new repository.
-# 2. Add two files to that repo:
-#       - app.py            (this file)
-#       - requirements.txt  (containing: streamlit\nopenai)
-# 3. Go to https://share.streamlit.io and sign in with GitHub.
+# 1. Get a free Gemini API key at https://aistudio.google.com/apikey
+#    (sign in with Google, click "Create API key" — no billing required).
+# 2. Push this app.py and requirements.txt to a public GitHub repo.
+# 3. Go to https://share.streamlit.io and sign in with GitHub (also free).
 # 4. Click "New app", select your repo, branch, and app.py as the entry point.
 # 5. Before deploying, click "Advanced settings" -> "Secrets" and add:
-#       OPENAI_API_KEY = "sk-...your-key..."
+#       GEMINI_API_KEY = "your-key-here"
 # 6. Click "Deploy". After a minute you'll get a public URL like:
 #       https://your-app-name.streamlit.app
 # 7. Open that link in a fresh browser tab to confirm it works, then paste it
-#    into Section 7 of AI_Learning_Buddy_Submission.docx.
+#    into Section 7 of your submission document.
 # ---------------------------------------------------------------------------
